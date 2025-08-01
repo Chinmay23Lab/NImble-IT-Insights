@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>From IT Liability to Strategic Leverage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page, narrative-driven dashboard. The structure guides the user from a high-level "hook" (the staggering financial cost), through an interactive exploration of the core problems (Technical Debt & Shadow IT), into the tangible impacts (financial, human), and finally to the strategic solution and its benefits. The new "Inquiry" section provides a direct call-to-action for lead generation. This non-linear, thematic structure is chosen over a simple report summary because it allows busy executives to grasp the core message—risk vs. opportunity—quickly and interactively. The flow is designed to build a compelling business case for proactive IT management by first establishing the problem's scale and then presenting a clear, actionable path to value creation, culminating in a direct engagement opportunity. -->
+    <!-- Visualization & Content Choices: The report's data is translated into interactive components to maximize engagement and understanding. Key figures are presented as animated counters for immediate impact. The central "Risk vs. Opportunity" concept is realized through interactive tabs, allowing users to compare the dual nature of each issue directly. A dynamic bar chart with a slider visualizes the abstract concept of budget drain, making it tangible. The solution is presented as a clean, expandable process diagram to convey a clear, strategic framework without overwhelming detail. The new inquiry form uses standard HTML inputs for data collection, formatted with Tailwind for responsiveness and clarity. These choices, using Chart.js for data visualization and custom HTML/CSS for diagrams and forms, are made to tell a compelling story with the data, encouraging exploration and insight rather than passive reading, and now, facilitating direct lead capture. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #2D3748;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4FD1C5;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tab-button.active {
+            background-color: #4FD1C5;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .process-step-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Strategic IT Insights</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#problem" class="nav-link text-gray-600 hover:text-gray-900 font-medium">The Core Challenge</a>
+                <a href="#impact" class="nav-link text-gray-600 hover:text-gray-900 font-medium">Financial Impact</a>
+                <a href="#solution" class="nav-link text-gray-600 hover:text-gray-900 font-medium">The Strategic Solution</a>
+                <a href="#benefits" class="nav-link text-gray-600 hover:text-gray-900 font-medium">The Payoff</a>
+                <a href="#inquiry" class="nav-link text-gray-600 hover:text-gray-900 font-medium">Inquiry</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-6xl font-extrabold text-gray-800 leading-tight">From <span class="text-red-500">Liability</span> to <span class="text-teal-500">Strategic Leverage</span></h2>
+                <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Your organization's biggest IT challenges—Technical Debt and Shadow IT—are not just costs. They are untapped opportunities for innovation, agility, and competitive advantage.</p>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div class="bg-gray-50 p-8 rounded-xl border border-gray-200">
+                        <p class="text-5xl font-bold text-red-500" id="counter1">0</p>
+                        <p class="mt-2 text-gray-600 font-medium">Trillion Annual Cost of Poor Software Quality in the US</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl border border-gray-200">
+                        <p class="text-5xl font-bold text-red-500" id="counter2">0</p>
+                        <p class="mt-2 text-gray-600 font-medium">% of IT Budgets Lost to Technical Debt Maintenance</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="problem" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-bold text-gray-800">The Core Challenge: A Dual Nature</h3>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Technical Debt and Shadow IT are two sides of the same coin. They present significant risks, but also signal where your greatest opportunities for improvement lie. This section provides an interactive dashboard to explore this duality.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                        <h4 class="text-2xl font-bold text-center mb-6">The Unseen Bill: Technical Debt</h4>
+                        <div class="flex justify-center mb-6 bg-gray-100 rounded-full p-1">
+                            <button data-target="tech-debt-risk" class="tab-button w-1/2 py-2 px-4 rounded-full font-semibold transition active">The Risk 💀</button>
+                            <button data-target="tech-debt-opp" class="tab-button w-1/2 py-2 px-4 rounded-full font-semibold transition">The Opportunity ✨</button>
+                        </div>
+                        <div id="tech-debt-risk" class="tab-content active space-y-4">
+                            <div class="stat-card bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="text-3xl font-bold text-red-600">10-30%</p>
+                                <p class="text-sm text-red-800">of new product development budgets are diverted to fixing debt.</p>
+                            </div>
+                            <div class="stat-card bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="text-3xl font-bold text-red-600">100x</p>
+                                <p class="text-sm text-red-800">cost escalation for bugs left unfixed, compounding into debt.</p>
+                            </div>
+                            <div class="stat-card bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="text-3xl font-bold text-red-600">80%</p>
+                                <p class="text-sm text-red-800">of technical debt will be architectural by 2026, affecting the entire system.</p>
+                            </div>
+                        </div>
+                        <div id="tech-debt-opp" class="tab-content space-y-4">
+                            <div class="stat-card bg-green-50 p-4 rounded-lg border border-green-200">
+                                <p class="text-3xl font-bold text-green-600">74%</p>
+                                <p class="text-sm text-green-800">potential reduction in hardware, software, and staffing costs via modernization.</p>
+                            </div>
+                             <div class="stat-card bg-green-50 p-4 rounded-lg border border-green-200">
+                                <p class="text-3xl font-bold text-green-600">20-40%</p>
+                                <p class="text-sm text-green-800">improvement in development velocity after addressing debt.</p>
+                            </div>
+                             <div class="stat-card bg-green-50 p-4 rounded-lg border border-green-200">
+                                <p class="text-3xl font-bold text-green-600">3-5x</p>
+                                <p class="text-sm text-green-800">faster launch times for new projects using modern, low-code approaches.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                        <h4 class="text-2xl font-bold text-center mb-6">The Shadow Economy: Shadow IT</h4>
+                         <div class="flex justify-center mb-6 bg-gray-100 rounded-full p-1">
+                            <button data-target="shadow-it-risk" class="tab-button w-1/2 py-2 px-4 rounded-full font-semibold transition active">The Risk 💀</button>
+                            <button data-target="shadow-it-opp" class="tab-button w-1/2 py-2 px-4 rounded-full font-semibold transition">The Opportunity ✨</button>
+                        </div>
+                        <div id="shadow-it-risk" class="tab-content active space-y-4">
+                            <div class="stat-card bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="text-3xl font-bold text-red-600">30-50%</p>
+                                <p class="text-sm text-red-800">of total IT spending occurs in the shadows, outside of IT's control.</p>
+                            </div>
+                            <div class="stat-card bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="text-3xl font-bold text-red-600">+$670k</p>
+                                <p class="text-sm text-red-800">average increase in data breach costs when shadow IT is prevalent.</p>
+                            </div>
+                            <div class="stat-card bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="text-3xl font-bold text-red-600">69%</p>
+                                <p class="text-sm text-red-800">of employees admit to intentionally bypassing cybersecurity guidance.</p>
+                            </div>
+                        </div>
+                        <div id="shadow-it-opp" class="tab-content space-y-4">
+                           <div class="stat-card bg-green-50 p-4 rounded-lg border border-green-200">
+                                <p class="text-green-600 font-bold">Grassroots Innovation</p>
+                                <p class="text-sm text-green-800">Shadow IT reveals unmet needs and points to innovative solutions your teams require to be agile.</p>
+                            </div>
+                             <div class="stat-card bg-green-50 p-4 rounded-lg border border-green-200">
+                                <p class="text-green-600 font-bold">Productivity Boost</p>
+                                <p class="text-sm text-green-800">Employees choose tools that make them more efficient. Harnessing this improves overall productivity.</p>
+                            </div>
+                             <div class="stat-card bg-green-50 p-4 rounded-lg border border-green-200">
+                                <p class="text-green-600 font-bold">Enhanced Engagement</p>
+                                <p class="text-sm text-green-800">Empowering employees with the right tools fosters a culture of trust, ownership, and satisfaction.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-bold text-gray-800">The Financial Impact: A Leaky Bucket</h3>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Technical debt doesn't just slow you down; it actively drains your innovation budget. This visualization shows how much of the budget intended for growth is redirected to fixing problems of the past. Adjust the slider to see how the impact changes based on an organization's technical debt maturity.</p>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-2xl shadow-inner border border-gray-200">
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                    <div class="mt-8 px-4">
+                         <label for="debtSlider" class="block text-center font-medium text-gray-700 mb-2">Organizational Technical Debt Level</label>
+                        <input id="debtSlider" type="range" min="10" max="40" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>Proactive Management</span>
+                            <span>Average</span>
+                            <span>Reactive / High Debt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="solution" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-bold text-gray-800">The Strategic Solution: A Proactive Framework</h3>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Moving from a reactive to a proactive stance is essential. The goal is not to eliminate debt and shadow IT overnight, but to manage them strategically. This framework outlines a path to transform IT from a cost center to a value driver. Click each step to learn more.</p>
+                </div>
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <div class="process-step bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                        <button class="w-full text-left p-6 flex justify-between items-center focus:outline-none">
+                            <div class="flex items-center">
+                                <span class="flex items-center justify-center h-12 w-12 rounded-full bg-teal-100 text-teal-600 font-bold text-xl mr-6">1</span>
+                                <div>
+                                    <h5 class="text-xl font-semibold">Discover & Unify</h5>
+                                    <p class="text-gray-500">Gain a complete view of your entire IT landscape.</p>
+                                </div>
+                            </div>
+                            <span class="text-2xl text-gray-400 transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="process-step-content px-6 pb-6 text-gray-600">
+                            <p>The foundation of strategic management is visibility. You can't manage what you can't see. This involves implementing discovery tools and Cloud Access Security Brokers (CASBs) to map all applications, devices, and services in use—including the 30-50% that constitute shadow IT. The goal is to create a single, unified source of truth for your entire IT estate, which serves as the basis for all subsequent analysis and decision-making.</p>
+                        </div>
+                    </div>
+
+                    <div class="process-step bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                        <button class="w-full text-left p-6 flex justify-between items-center focus:outline-none">
+                             <div class="flex items-center">
+                                <span class="flex items-center justify-center h-12 w-12 rounded-full bg-teal-100 text-teal-600 font-bold text-xl mr-6">2</span>
+                                <div>
+                                    <h5 class="text-xl font-semibold">Analyze & Prioritize</h5>
+                                    <p class="text-gray-500">Make data-driven decisions based on business impact.</p>
+                                </div>
+                            </div>
+                            <span class="text-2xl text-gray-400 transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="process-step-content px-6 pb-6 text-gray-600">
+                            <p>With full visibility, the next step is to analyze and prioritize. For technical debt, this means quantifying its financial impact and business risk, then prioritizing remediation efforts on issues that pose the greatest threat to innovation and stability. For shadow IT, it means analyzing usage patterns to understand unmet business needs. Instead of a blanket ban, IT collaborates with business units to provide secure, sanctioned alternatives that empower employees without compromising security.</p>
+                        </div>
+                    </div>
+
+                    <div class="process-step bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+                        <button class="w-full text-left p-6 flex justify-between items-center focus:outline-none">
+                            <div class="flex items-center">
+                                <span class="flex items-center justify-center h-12 w-12 rounded-full bg-teal-100 text-teal-600 font-bold text-xl mr-6">3</span>
+                                <div>
+                                    <h5 class="text-xl font-semibold">Automate & Secure</h5>
+                                    <p class="text-gray-500">Implement proactive governance and security.</p>
+                                </div>
+                            </div>
+                            <span class="text-2xl text-gray-400 transform transition-transform duration-300">+</span>
+                        </button>
+                        <div class="process-step-content px-6 pb-6 text-gray-600">
+                            <p>The final step is to build a resilient, future-proof IT environment. This involves automating security and compliance processes to ensure consistent adherence to policies. Leveraging AI and machine learning for predictive threat detection allows you to anticipate and mitigate risks before they materialize. This creates a threat intelligence-driven ecosystem that is not only secure but also agile, freeing up resources to focus on strategic growth initiatives rather than firefighting.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-bold text-gray-800">The Payoff: Quantifiable Business Value</h3>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Adopting a strategic approach yields significant, measurable returns across the organization, transforming IT into a powerful engine for competitive advantage.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="stat-card bg-gray-50 p-8 rounded-xl border border-gray-200 text-center">
+                        <p class="text-5xl font-bold text-teal-500">15-25%</p>
+                        <p class="mt-2 text-gray-600 font-medium">Decrease in Operational Costs</p>
+                    </div>
+                    <div class="stat-card bg-gray-50 p-8 rounded-xl border border-gray-200 text-center">
+                        <p class="text-5xl font-bold text-teal-500">30-60%</p>
+                        <p class="mt-2 text-gray-600 font-medium">Reduction in Production Incidents</p>
+                    </div>
+                    <div class="stat-card bg-gray-50 p-8 rounded-xl border border-gray-200 text-center">
+                        <p class="text-5xl font-bold text-teal-500">92%</p>
+                        <p class="mt-2 text-gray-600 font-medium">Faster Response to Security Threats</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="inquiry" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-bold text-gray-800">Strategic Assessment Inquiry</h3>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Ready to uncover the hidden opportunities within your IT ecosystem? Fill out the form below to initiate a complimentary IT Infrastructure Intelligence Audit with Nimble Technologies. Let's transform your IT challenges into strategic advantages.</p>
+                </div>
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                    <form id="inquiryForm" action="https://formspree.io/f/meozzbol" method="POST" class="space-y-6">
+                        <!-- IMPORTANT: Replace YOUR_FORMSPREE_ENDPOINT with your actual Formspree endpoint after setting up your form on Formspree.io -->
+                        <div>
+                            <label for="fullName" class="block text-sm font-medium text-gray-700">Your Full Name</label>
+                            <input type="text" id="fullName" name="fullName" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label for="companyName" class="block text-sm font-medium text-gray-700">Company Name</label>
+                            <input type="text" id="companyName" name="companyName" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label for="workEmail" class="block text-sm font-medium text-gray-700">Work Email</label>
+                            <input type="email" id="workEmail" name="workEmail" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
+                            <input type="tel" id="phoneNumber" name="phoneNumber" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label for="currentChallenges" class="block text-sm font-medium text-gray-700">Briefly describe your current IT challenges</label>
+                            <textarea id="currentChallenges" name="currentChallenges" rows="4" required placeholder="e.g., 'High technical debt in legacy systems', 'Lack of visibility into shadow IT', 'Slow development cycles'" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="desiredOutcomes" class="block text-sm font-medium text-gray-700">What are your desired outcomes from partnering with Nimble Technologies?</label>
+                            <textarea id="desiredOutcomes" name="desiredOutcomes" rows="4" required placeholder="e.g., 'Reduce operational costs by 20%', 'Accelerate innovation by 30%', 'Improve cybersecurity posture'" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"></textarea>
+                        </div>
+                        <div>
+                            <label for="budgetRange" class="block text-sm font-medium text-gray-700">Estimated Budget for this Initiative</label>
+                            <select id="budgetRange" name="budgetRange" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                                <option value="">Please Select</option>
+                                <option value="Under $50,000">Under $50,000</option>
+                                <option value="$50,000 - $100,000">$50,000 - $100,000</option>
+                                <option value="$100,000 - $250,000">$100,000 - $250,000</option>
+                                <option value="$250,000 - $500,000">$250,000 - $500,000</option>
+                                <option value="Over $500,000">Over $500,000</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-full transition duration-300">Submit Inquiry</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <h4 class="text-2xl font-bold">Ready to Transform Your IT Strategy?</h4>
+            <p class="mt-4 max-w-2xl mx-auto">The journey from liability to leverage begins with understanding your true IT landscape. Let's start a conversation about how proactive intelligence can turn your biggest challenges into your most powerful assets.</p>
+            <a href="#inquiry" class="inline-block mt-8 bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-full transition duration-300">Initiate a Strategic Assessment</a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            function animateCounter(element, target, duration, isCurrency = false, currencySymbol = '$', suffix = '') {
+                let start = 0;
+                const increment = target / (duration / 16);
+                
+                function updateCounter() {
+                    start += increment;
+                    if (start < target) {
+                        let displayValue;
+                        if (isCurrency) {
+                            displayValue = currencySymbol + (start / 1000000000000).toFixed(2);
+                        } else {
+                            displayValue = Math.ceil(start);
+                        }
+                        element.innerText = displayValue + suffix;
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        let finalValue;
+                         if (isCurrency) {
+                            finalValue = currencySymbol + (target / 1000000000000).toFixed(2);
+                        } else {
+                            finalValue = target;
+                        }
+                        element.innerText = finalValue + suffix;
+                    }
+                }
+                updateCounter();
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter1 = document.getElementById('counter1');
+                        const counter2 = document.getElementById('counter2');
+                        
+                        animateCounter(counter1, 2410000000000, 2000, true, '$');
+                        animateCounter(counter2, 40, 2000, false, '%');
+                        
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            const heroSection = document.getElementById('hero');
+            if(heroSection) {
+                observer.observe(heroSection);
+            }
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const parent = button.parentElement.parentElement;
+                    const targetId = button.dataset.target;
+                    
+                    parent.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    parent.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetId) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            const processSteps = document.querySelectorAll('.process-step button');
+            processSteps.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('span:last-child');
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        content.style.paddingTop = null;
+                        content.style.paddingBottom = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        content.style.paddingTop = "0";
+                        content.style.paddingBottom = "1.5rem";
+                        icon.style.transform = 'rotate(45deg)';
+                    }
+                });
+            });
+
+            const budgetCtx = document.getElementById('budgetChart');
+            if (budgetCtx) {
+                const budgetChart = new Chart(budgetCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['IT Budget Allocation'],
+                        datasets: [
+                            {
+                                label: 'Diverted to Tech Debt',
+                                data: [20],
+                                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                                borderWidth: 1,
+                                barPercentage: 0.6,
+                            },
+                            {
+                                label: 'Available for Innovation',
+                                data: [80],
+                                backgroundColor: 'rgba(20, 184, 166, 0.7)',
+                                borderWidth: 1,
+                                barPercentage: 0.6,
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Innovation Budget vs. Technical Debt Drain',
+                                font: { size: 16 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw}%`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'bottom',
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + "%"
+                                    }
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+
+                const debtSlider = document.getElementById('debtSlider');
+                if (debtSlider) {
+                    debtSlider.addEventListener('input', function() {
+                        const debtValue = parseInt(this.value);
+                        budgetChart.data.datasets[0].data[0] = debtValue;
+                        budgetChart.data.datasets[1].data[0] = 100 - debtValue;
+                        budgetChart.update();
+                    });
+                }
+            }
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 60) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // The mailto: logic is removed from here as Formspree handles the submission
+            // const inquiryForm = document.getElementById('inquiryForm');
+            // if (inquiryForm) {
+            //     inquiryForm.addEventListener('submit', function(event) {
+            //         event.preventDefault(); // Prevent default form submission
+
+            //         const fullName = document.getElementById('fullName').value;
+            //         const companyName = document.getElementById('companyName').value;
+            //         const workEmail = document.getElementById('workEmail').value;
+            //         const phoneNumber = document.getElementById('phoneNumber').value;
+            //         const currentChallenges = document.getElementById('currentChallenges').value;
+            //         const desiredOutcomes = document.getElementById('desiredOutcomes').value;
+            //         const budgetRange = document.getElementById('budgetRange').value;
+
+            //         const subject = encodeURIComponent('Strategic Assessment Inquiry from ' + fullName + ' - ' + companyName);
+            //         const body = encodeURIComponent(
+            //             'Full Name: ' + fullName + '\n' +
+            //             'Company Name: ' + companyName + '\n' +
+            //             'Work Email: ' + workEmail + '\n' +
+            //             'Phone Number: ' + (phoneNumber ? phoneNumber : 'N/A') + '\n\n' +
+            //             'Current IT Challenges:\n' + currentChallenges + '\n\n' +
+            //             'Desired Outcomes from Nimble Technologies:\n' + desiredOutcomes + '\n\n' +
+            //             'Estimated Budget for this Initiative: ' + budgetRange + '\n\n' +
+            //             'This inquiry was submitted via the Nimble Technologies interactive report.'
+            //         );
+
+            //         window.location.href = 'mailto:chinmay@nimbletechnologies.biz?subject=' + subject + '&body=' + body;
+            //     });
+            // }
+        });
+    </script>
+</body>
+</html>
